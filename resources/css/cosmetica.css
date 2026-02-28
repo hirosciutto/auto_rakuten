@@ -141,7 +141,14 @@ button:focus-visible {
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  padding: 14px 0;
+  padding: 8px 0;
+}
+
+.c-header__brand {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  justify-content: center;
 }
 
 .c-header__logo {
@@ -151,6 +158,15 @@ button:focus-visible {
   max-width: 200px;
   object-fit: contain;
   object-position: left center;
+}
+
+.c-header__catchphrase {
+  margin: 0;
+  font-size: 10px;
+  line-height: 1.2;
+  font-weight: 400;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
 }
 
 .c-header__search {

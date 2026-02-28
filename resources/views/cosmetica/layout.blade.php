@@ -14,16 +14,19 @@
     <header class="c-header">
         <div class="c-container">
             <div class="c-header__inner">
-                <a href="{{ url('/') }}" aria-label="COSMETICA トップへ">
-                    <img
-                        src="{{ asset('assets/title.png') }}"
-                        alt="COSMETICA"
-                        class="c-header__logo"
-                        width=""
-                        height="40"
-                        decoding="async"
-                    />
-                </a>
+                <div class="c-header__brand">
+                    <a href="{{ url('/') }}" aria-label="COSMETICA トップへ">
+                        <img
+                            src="{{ asset('assets/title.png') }}"
+                            alt="COSMETICA"
+                            class="c-header__logo"
+                            width=""
+                            height="40"
+                            decoding="async"
+                        />
+                    </a>
+                    <p class="c-header__catchphrase">コスメ・美容のトレンドが、ここに。</p>
+                </div>
                 <div class="c-header__search">
                     <form action="{{ url('/') }}" method="get" role="search">
                         <label for="header-search" class="visually-hidden">キーワードで検索</label>
