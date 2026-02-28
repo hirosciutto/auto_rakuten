@@ -1,2 +1,5 @@
 <?php
-return [];
+return [
+    'fields' => [],
+    'default' => [],
+];

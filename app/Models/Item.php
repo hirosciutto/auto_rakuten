@@ -68,4 +68,10 @@ class Item extends Model
         return $this->belongsToMany(Site::class, 'item_sites', 'item_id', 'site_id')
             ->withTimestamps();
     }
+
+    public function cosmeCategories(): BelongsToMany
+    {
+        return $this->belongsToMany(CosmeCategory::class, 'item_cosme_categories', 'item_id', 'cosme_category_id')
+            ->withTimestamps();
+    }
 }
