@@ -16,9 +16,9 @@ class CosmeCategory extends Model
         'sort_order',
     ];
 
-    public function items(): BelongsToMany
+    public function posts(): BelongsToMany
     {
-        return $this->belongsToMany(Item::class, 'item_cosme_categories', 'cosme_category_id', 'item_id')
+        return $this->belongsToMany(Post::class, 'cosme_category_posts', 'cosme_category_id', 'post_id')
             ->withTimestamps();
     }
 

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Item extends Model
 {
@@ -69,9 +70,8 @@ class Item extends Model
             ->withTimestamps();
     }
 
-    public function cosmeCategories(): BelongsToMany
+    public function posts(): HasMany
     {
-        return $this->belongsToMany(CosmeCategory::class, 'item_cosme_categories', 'item_id', 'cosme_category_id')
-            ->withTimestamps();
+        return $this->hasMany(Post::class, 'item_id');
     }
 }

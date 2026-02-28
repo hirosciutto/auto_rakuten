@@ -167,8 +167,65 @@ GET /api/items
 }
 ```
 
-`data` 内の各要素には、`items` テーブルの項目（商品名・価格・URL・画像URL・レビュー数など）が含まれます。  
-`shop` は紐づくショップ情報です。
+**`data` 内の各要素（商品オブジェクト）のプロパティ一覧**
+
+| プロパティ | 型 | 説明 |
+|------------|-----|------|
+| id | integer | 商品ID（内部） |
+| shop_id | integer \| null | ショップID |
+| item_code | string | 商品コード（例: shop:1234） |
+| item_name | string \| null | 商品名 |
+| catchcopy | string \| null | キャッチコピー |
+| item_price | integer \| null | 商品価格 |
+| item_caption | string \| null | 商品説明 |
+| item_url | string \| null | 商品URL |
+| affiliate_url | string \| null | アフィリエイトURL |
+| item_price_base_field | string \| null | 価格ベースフィールド |
+| item_price_max1 | integer \| null | 価格 max1 |
+| item_price_max2 | integer \| null | 価格 max2 |
+| item_price_max3 | integer \| null | 価格 max3 |
+| item_price_min1 | integer \| null | 価格 min1 |
+| item_price_min2 | integer \| null | 価格 min2 |
+| item_price_min3 | integer \| null | 価格 min3 |
+| image_flag | integer \| null | 0: 画像なし / 1: 画像あり |
+| small_image_urls | array \| null | 小さい画像URL（64x64、最大3件） |
+| medium_image_urls | array \| null | 中画像URL（128x128、最大3件） |
+| availability | integer \| null | 0: 在庫切れ / 1: 在庫あり |
+| tax_flag | integer \| null | 0: 税込 / 1: 税抜 |
+| postage_flag | integer \| null | 0: 送料込み / 1: 送料別 |
+| credit_card_flag | integer \| null | 0: 不可 / 1: 可 |
+| shop_of_the_year_flag | integer \| null | 0: 未受賞 / 1: 受賞 |
+| ship_overseas_flag | integer \| null | 0: 不可 / 1: 可 |
+| ship_overseas_area | string \| null | 海外配送エリア |
+| asuraku_flag | integer \| null | 0: 対象外 / 1: あす楽可 |
+| asuraku_closing_time | string \| null | あす楽締め切り（HH:MM） |
+| asuraku_area | string \| null | あす楽配送エリア |
+| affiliate_rate | number \| null | アフィリエイト率 |
+| start_time | string \| null | セール開始（YYYY-MM-DD HH:MM） |
+| end_time | string \| null | セール終了（YYYY-MM-DD HH:MM） |
+| review_count | integer \| null | レビュー数 |
+| review_average | number \| null | レビュー平均 |
+| point_rate | integer \| null | ポイント倍率 |
+| point_rate_start_time | string \| null | ポイント倍率開始 |
+| point_rate_end_time | string \| null | ポイント倍率終了 |
+| gift_flag | integer \| null | 0: ラッピング不可 / 1: 可 |
+| genre_id | integer \| null | ジャンルID |
+| tag_ids | array \| null | タグIDの配列 |
+| created_at | string | 作成日時（ISO 8601） |
+| updated_at | string | 更新日時（ISO 8601） |
+| shop | object | 紐づくショップ（下記） |
+
+**`shop` オブジェクトのプロパティ一覧**
+
+| プロパティ | 型 | 説明 |
+|------------|-----|------|
+| id | integer | ショップID |
+| shop_code | string | ショップコード |
+| shop_name | string | ショップ名 |
+| shop_url | string | ショップURL |
+| shop_affiliate_url | string \| null | ショップアフィリエイトURL |
+| created_at | string | 作成日時 |
+| updated_at | string | 更新日時 |
 
 #### エラー時
 

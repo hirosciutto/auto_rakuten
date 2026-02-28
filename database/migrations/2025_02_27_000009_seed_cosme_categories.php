@@ -34,7 +34,7 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
-     * ロールバック時は item_cosme_categories を先に削除すること。
+     * ロールバック時は cosme_category_posts / item_cosme_categories を先に削除すること。
      */
     public function down(): void
     {
