@@ -12,7 +12,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        $siteId = config('cosmetica.site_id', 1);
+        $schedule->command("itemlist:search {$siteId} once")->everyFiveMinutes();
+        $schedule->command("itemlist:search {$siteId} daily")->dailyAt('00:00');
+        $schedule->command("itemlist:search {$siteId} weekly")->weeklyOn(1, '00:00');
+        $schedule->command("itemlist:search {$siteId} monthly")->monthlyOn(1, '00:00');
     }
 
     /**
