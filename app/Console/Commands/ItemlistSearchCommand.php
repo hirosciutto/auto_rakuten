@@ -84,7 +84,10 @@ class ItemlistSearchCommand extends Command
 
             $this->line("  [OK] search_condition_id={$condition->id} fetched={$result['count']} saved_items={$result['saved_items']} saved_shops={$result['saved_shops']}");
         } catch (\Throwable $e) {
-            $log->update(['status' => SearchLog::STATUS_FAILED]);
+            $log->update([
+                'status' => SearchLog::STATUS_FAILED,
+                'error_message' => $e->getMessage(),
+            ]);
             $this->error("  [FAIL] search_condition_id={$condition->id} " . $e->getMessage());
             if ($this->output->isVerbose()) {
                 $this->error($e->getTraceAsString());

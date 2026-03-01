@@ -17,6 +17,7 @@ class SearchLog extends Model
         'search_condition_id',
         'frequency',
         'status',
+        'error_message',
     ];
 
     public function searchCondition(): BelongsTo
