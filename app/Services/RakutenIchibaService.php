@@ -161,6 +161,9 @@ class RakutenIchibaService
         if ($condition->tag_id) {
             $params['tagId'] = $condition->tag_id;
         }
+        if ($condition->sort) {
+            $params['sort'] = $condition->sort;
+        }
         if ($condition->min_price !== null) {
             $params['minPrice'] = $condition->min_price;
         }

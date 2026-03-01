@@ -28,6 +28,11 @@ class StoreSearchConditionRequest extends FormRequest
             'item_code' => ['nullable', 'string', 'max:64'],
             'genre_id' => ['nullable', 'integer'],
             'tag_id' => ['nullable', 'string', 'max:128'],
+            'sort' => ['nullable', 'string', Rule::in([
+                'standard', '+itemPrice', '-itemPrice',
+                '+reviewCount', '-reviewCount', '+reviewAverage', '-reviewAverage',
+                '+affiliateRate', '-affiliateRate', '+updateTimestamp', '-updateTimestamp',
+            ])],
             'min_price' => ['nullable', 'integer', 'min:0', 'max:999999998'],
             'max_price' => ['nullable', 'integer', 'min:0', 'max:999999999'],
             'availability' => ['nullable', 'integer', 'in:0,1'],

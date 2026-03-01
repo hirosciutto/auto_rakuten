@@ -21,6 +21,7 @@ class SearchCondition extends Model
         'item_code',
         'genre_id',
         'tag_id',
+        'sort',
         'min_price',
         'max_price',
         'availability',

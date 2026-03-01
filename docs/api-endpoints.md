@@ -40,6 +40,7 @@ POST /api/search-conditions
 | item_code | string | 商品コード（最大64文字）。例: `shop:1234` |
 | genre_id | integer | ジャンルID |
 | tag_id | string | タグID（カンマ区切り可、最大128文字） |
+| sort | string | 楽天API ソート。`standard`（省略時）/ `+itemPrice` / `-itemPrice` / `+reviewCount` / `-reviewCount` / `+reviewAverage` / `-reviewAverage` / `+affiliateRate` / `-affiliateRate` / `+updateTimestamp` / `-updateTimestamp` |
 | total_hits | integer | 取得目標件数（1〜3000）。省略時は 300。hits=30 で page 1 から繰り返し、合計この件数まで取得。overwrite=0 の場合は既存紐づけをスキップし新規がこの件数になるまで最大100ページまで取得。 |
 | min_price | integer | 最低価格（0〜999999998） |
 | max_price | integer | 最高価格（0〜999999999） |
