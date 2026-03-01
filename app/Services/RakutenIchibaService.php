@@ -65,7 +65,6 @@ class RakutenIchibaService
         $savedItems = 0;
         $totalFetched = 0;
 
-        DB::beginTransaction();
         try {
             if ($overwrite) {
                 $totalPages = (int) min(self::PAGE_MAX, ceil($targetCount / self::HITS_MAX));
@@ -77,19 +76,26 @@ class RakutenIchibaService
                     $items = $data['items'] ?? [];
                     $totalFetched += count($items);
 
-                    foreach ($items as $row) {
-                        $shop = $this->upsertShop($row);
-                        if ($shop->wasRecentlyCreated) {
-                            $savedShops++;
-                        }
-                        $item = $this->upsertItem($row, $shop->id, true);
-                        if ($item) {
-                            $savedItems++;
-                            $item->sites()->syncWithoutDetaching([$siteId]);
-                        }
-                    }
-                    if ($page < $totalPages) {
+                    if ($page > 1) {
                         sleep(self::RATE_LIMIT_SECONDS);
+                    }
+                    DB::beginTransaction();
+                    try {
+                        foreach ($items as $row) {
+                            $shop = $this->upsertShop($row);
+                            if ($shop->wasRecentlyCreated) {
+                                $savedShops++;
+                            }
+                            $item = $this->upsertItem($row, $shop->id, true);
+                            if ($item) {
+                                $savedItems++;
+                                $item->sites()->syncWithoutDetaching([$siteId]);
+                            }
+                        }
+                        DB::commit();
+                    } catch (\Throwable $e) {
+                        DB::rollBack();
+                        throw $e;
                     }
                 }
             } else {
@@ -103,35 +109,39 @@ class RakutenIchibaService
                     $items = $data['items'] ?? [];
                     $totalFetched += count($items);
 
-                    foreach ($items as $row) {
-                        if ($newLinked >= $targetCount) {
-                            break;
-                        }
-                        $shop = $this->upsertShop($row);
-                        if ($shop->wasRecentlyCreated) {
-                            $savedShops++;
-                        }
-                        $item = $this->upsertItem($row, $shop->id, false);
-                        if (! $item) {
-                            continue;
-                        }
-                        $alreadyLinked = $item->sites()->where('sites.id', $siteId)->exists();
-                        if (! $alreadyLinked) {
-                            $item->sites()->syncWithoutDetaching([$siteId]);
-                            $newLinked++;
-                            $savedItems++;
-                        }
-                    }
-                    $page++;
-                    if ($newLinked < $targetCount && $page <= self::PAGE_MAX) {
+                    if ($page > 1) {
                         sleep(self::RATE_LIMIT_SECONDS);
                     }
+                    DB::beginTransaction();
+                    try {
+                        foreach ($items as $row) {
+                            if ($newLinked >= $targetCount) {
+                                break;
+                            }
+                            $shop = $this->upsertShop($row);
+                            if ($shop->wasRecentlyCreated) {
+                                $savedShops++;
+                            }
+                            $item = $this->upsertItem($row, $shop->id, false);
+                            if (! $item) {
+                                continue;
+                            }
+                            $alreadyLinked = $item->sites()->where('sites.id', $siteId)->exists();
+                            if (! $alreadyLinked) {
+                                $item->sites()->syncWithoutDetaching([$siteId]);
+                                $newLinked++;
+                                $savedItems++;
+                            }
+                        }
+                        DB::commit();
+                    } catch (\Throwable $e) {
+                        DB::rollBack();
+                        throw $e;
+                    }
+                    $page++;
                 }
             }
-
-            DB::commit();
         } catch (\Throwable $e) {
-            DB::rollBack();
             throw $e;
         }
 
