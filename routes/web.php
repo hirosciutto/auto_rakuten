@@ -14,9 +14,8 @@ use TCG\Voyager\Facades\Voyager;
 |
 */
 
-Route::get('/', [App\Http\Controllers\Front\CosmeticaController::class, 'index'])->name('cosmetica.home');
-Route::get('/cosmetica', [App\Http\Controllers\Front\CosmeticaController::class, 'index']);
-Route::get('/cosmetica/items', [App\Http\Controllers\Front\CosmeticaController::class, 'items'])->name('cosmetica.items');
+Route::get('/', [App\Http\Controllers\Front\TopController::class, 'index'])->name('top');
+Route::get('/fetch/items', [App\Http\Controllers\Front\TopController::class, 'items'])->name('fetch.items');
 
 // クローラ向け（Google 等）
 Route::get('/sitemap.xml', [App\Http\Controllers\Front\SitemapController::class, 'index'])->name('sitemap');

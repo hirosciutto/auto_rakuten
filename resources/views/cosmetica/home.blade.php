@@ -182,7 +182,7 @@
                 skeleton.style.display = grid.style.display === 'none' ? 'grid' : 'none';
                 if (!append) grid.innerHTML = '';
                 grid.style.display = 'none';
-                fetch('{{ url("/cosmetica/items") }}?' + params, { headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } })
+                fetch('{{ url("/fetch/items") }}?' + params, { headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } })
                     .then(function(r) { return r.json(); })
                     .then(function(res) {
                         skeleton.style.display = 'none';

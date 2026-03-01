@@ -9,10 +9,10 @@ use App\Models\Site;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-class CosmeticaController extends Controller
+class TopController extends Controller
 {
     /**
-     * コスメティカ トップページ（フロントの「商品」= posts）
+     * トップページ（フロントの「商品」= posts）
      */
     public function index(): View
     {

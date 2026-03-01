@@ -45,6 +45,24 @@ class RakutenIchibaService
             throw new \RuntimeException('Rakuten API error: ' . ($data['error_description'] ?? $data['error']));
         }
 
+        $items = $data['items'] ?? $data['Items'] ?? [];
+        $count = (int) ($data['count'] ?? $data['Count'] ?? 0);
+        $itemCount = is_array($items) ? count($items) : 0;
+        $firstItemKeys = null;
+        if ($itemCount > 0 && is_array($items)) {
+            $first = $items[0];
+            $firstItemKeys = is_array($first) ? array_keys($first) : (is_object($first) ? array_keys((array) $first) : gettype($first));
+        }
+        Log::info('RakutenIchibaService.searchOnePage', [
+            'search_condition_id' => $condition->id,
+            'page' => $page,
+            'hits' => $hits,
+            'api_count' => $count,
+            'items_in_response' => $itemCount,
+            'response_keys' => array_keys($data),
+            'first_item_keys' => $firstItemKeys,
+        ]);
+
         return $data;
     }
 
@@ -61,6 +79,13 @@ class RakutenIchibaService
         $targetCount = max(1, (int) $condition->total_hits);
         $overwrite = $condition->overwrite === 1;
 
+        Log::info('RakutenIchibaService.searchAndSave start', [
+            'search_condition_id' => $condition->id,
+            'site_id' => $siteId,
+            'target_count' => $targetCount,
+            'overwrite' => $overwrite,
+        ]);
+
         $savedShops = 0;
         $savedItems = 0;
         $totalFetched = 0;
@@ -73,26 +98,38 @@ class RakutenIchibaService
                         ? ($targetCount % self::HITS_MAX)
                         : self::HITS_MAX;
                     $data = $this->searchOnePage($condition, $page, $hits);
-                    $items = $data['items'] ?? [];
+                    $items = $data['items'] ?? $data['Items'] ?? [];
+                    $items = is_array($items) ? $items : [];
                     $totalFetched += count($items);
 
                     if ($page > 1) {
                         sleep(self::RATE_LIMIT_SECONDS);
                     }
+                    $pageSavedShops = 0;
+                    $pageSavedItems = 0;
                     DB::beginTransaction();
                     try {
                         foreach ($items as $row) {
                             $shop = $this->upsertShop($row);
                             if ($shop->wasRecentlyCreated) {
-                                $savedShops++;
+                                $pageSavedShops++;
                             }
                             $item = $this->upsertItem($row, $shop->id, true);
                             if ($item) {
-                                $savedItems++;
+                                $pageSavedItems++;
                                 $item->sites()->syncWithoutDetaching([$siteId]);
                             }
                         }
                         DB::commit();
+                        $savedShops += $pageSavedShops;
+                        $savedItems += $pageSavedItems;
+                        Log::info('RakutenIchibaService.searchAndSave page saved (overwrite=1)', [
+                            'search_condition_id' => $condition->id,
+                            'page' => $page,
+                            'items_fetched' => count($items),
+                            'saved_items_this_page' => $pageSavedItems,
+                            'saved_shops_this_page' => $pageSavedShops,
+                        ]);
                     } catch (\Throwable $e) {
                         DB::rollBack();
                         throw $e;
@@ -106,12 +143,14 @@ class RakutenIchibaService
                         ? $targetCount
                         : self::HITS_MAX;
                     $data = $this->searchOnePage($condition, $page, $hits);
-                    $items = $data['items'] ?? [];
+                    $items = $data['items'] ?? $data['Items'] ?? [];
+                    $items = is_array($items) ? $items : [];
                     $totalFetched += count($items);
 
                     if ($page > 1) {
                         sleep(self::RATE_LIMIT_SECONDS);
                     }
+                    $pageSavedItems = 0;
                     DB::beginTransaction();
                     try {
                         foreach ($items as $row) {
@@ -130,10 +169,18 @@ class RakutenIchibaService
                             if (! $alreadyLinked) {
                                 $item->sites()->syncWithoutDetaching([$siteId]);
                                 $newLinked++;
-                                $savedItems++;
+                                $pageSavedItems++;
                             }
                         }
                         DB::commit();
+                        $savedItems += $pageSavedItems;
+                        Log::info('RakutenIchibaService.searchAndSave page saved (overwrite=0)', [
+                            'search_condition_id' => $condition->id,
+                            'page' => $page,
+                            'items_fetched' => count($items),
+                            'new_linked_this_page' => $pageSavedItems,
+                            'new_linked_total' => $newLinked,
+                        ]);
                     } catch (\Throwable $e) {
                         DB::rollBack();
                         throw $e;
@@ -144,6 +191,13 @@ class RakutenIchibaService
         } catch (\Throwable $e) {
             throw $e;
         }
+
+        Log::info('RakutenIchibaService.searchAndSave end', [
+            'search_condition_id' => $condition->id,
+            'total_fetched' => $totalFetched,
+            'saved_items' => $savedItems,
+            'saved_shops' => $savedShops,
+        ]);
 
         return [
             'count' => $totalFetched,
