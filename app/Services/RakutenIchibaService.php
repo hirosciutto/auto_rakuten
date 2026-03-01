@@ -15,6 +15,9 @@ class RakutenIchibaService
 
     private const PAGE_MAX = 100;
 
+    /** 楽天API レート制限対策：リクエスト間の待機秒数 */
+    private const RATE_LIMIT_SECONDS = 1;
+
     /**
      * 1ページ分の検索を実行する。
      *
@@ -85,6 +88,9 @@ class RakutenIchibaService
                             $item->sites()->syncWithoutDetaching([$siteId]);
                         }
                     }
+                    if ($page < $totalPages) {
+                        sleep(self::RATE_LIMIT_SECONDS);
+                    }
                 }
             } else {
                 $newLinked = 0;
@@ -117,6 +123,9 @@ class RakutenIchibaService
                         }
                     }
                     $page++;
+                    if ($newLinked < $targetCount && $page <= self::PAGE_MAX) {
+                        sleep(self::RATE_LIMIT_SECONDS);
+                    }
                 }
             }
 
