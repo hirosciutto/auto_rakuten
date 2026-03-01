@@ -138,13 +138,14 @@ class RakutenIchibaService
         $config = config('rakuten');
         $params = [
             'applicationId' => $config['application_id'],
+            'accessKey' => $config['access_key'],
             'affiliateId' => $config['affiliate_id'] ?: null,
             'formatVersion' => config('rakuten.item_search.format_version'),
             'hits' => min(self::HITS_MAX, max(1, $hits)),
             'page' => $page,
         ];
 
-        $params = array_filter($params);
+        $params = array_filter($params, fn ($v) => $v !== null && $v !== '');
 
         if ($condition->keyword) {
             $params['keyword'] = $condition->keyword;
