@@ -74,4 +74,12 @@ class Item extends Model
     {
         return $this->hasMany(Post::class, 'item_id');
     }
+
+    /**
+     * 楽天ジャンル（items.genre_id → genres.id）
+     */
+    public function genre(): BelongsTo
+    {
+        return $this->belongsTo(Genre::class, 'genre_id', 'id');
+    }
 }

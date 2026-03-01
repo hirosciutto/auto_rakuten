@@ -27,17 +27,17 @@ class SearchConditionController extends Controller
             'item_code',
             'genre_id',
             'tag_id',
-            'page',
             'min_price',
             'max_price',
             'availability',
             'purchase_type',
             'overwrite',
             'is_active',
+            'total_hits',
         ]);
 
         $attributes['site_id'] = $site->id;
-        $attributes['total_hits'] = 0;
+        $attributes['total_hits'] = $attributes['total_hits'] ?? 300;
         $attributes['overwrite'] = $attributes['overwrite'] ?? 0;
         $attributes['is_active'] = $attributes['is_active'] ?? 1;
 

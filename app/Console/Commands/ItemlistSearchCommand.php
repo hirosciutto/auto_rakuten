@@ -81,9 +81,8 @@ class ItemlistSearchCommand extends Command
             $result = $service->searchAndSave($condition, $siteId);
 
             $log->update(['status' => SearchLog::STATUS_SUCCESS]);
-            $condition->update(['total_hits' => $result['count']]);
 
-            $this->line("  [OK] search_condition_id={$condition->id} count={$result['count']} saved_items={$result['saved_items']} saved_shops={$result['saved_shops']}");
+            $this->line("  [OK] search_condition_id={$condition->id} fetched={$result['count']} saved_items={$result['saved_items']} saved_shops={$result['saved_shops']}");
         } catch (\Throwable $e) {
             $log->update(['status' => SearchLog::STATUS_FAILED]);
             $this->error("  [FAIL] search_condition_id={$condition->id} " . $e->getMessage());

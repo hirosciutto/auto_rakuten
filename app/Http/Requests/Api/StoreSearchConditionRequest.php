@@ -20,6 +20,7 @@ class StoreSearchConditionRequest extends FormRequest
         return [
             'access_code' => ['required', 'string'],
             'frequency' => ['required', 'string', Rule::in(['once', 'daily', 'weekly', 'monthly'])],
+            'total_hits' => ['nullable', 'integer', 'min:1', 'max:3000'],
             'keyword' => ['nullable', 'string', 'max:256'],
             'or_flag' => ['nullable', 'integer', 'in:0,1'],
             'ng_keyword' => ['nullable', 'string', 'max:256'],
@@ -27,7 +28,6 @@ class StoreSearchConditionRequest extends FormRequest
             'item_code' => ['nullable', 'string', 'max:64'],
             'genre_id' => ['nullable', 'integer'],
             'tag_id' => ['nullable', 'string', 'max:128'],
-            'page' => ['nullable', 'integer', 'min:1', 'max:100'],
             'min_price' => ['nullable', 'integer', 'min:0', 'max:999999998'],
             'max_price' => ['nullable', 'integer', 'min:0', 'max:999999999'],
             'availability' => ['nullable', 'integer', 'in:0,1'],

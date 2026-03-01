@@ -9,9 +9,8 @@ class SearchLog extends Model
 {
     protected $table = 'search_logs';
 
-    const STATUS_PENDING = 0;
-    const STATUS_RUNNING = 1;
-    const STATUS_SUCCESS = 2;
+    const STATUS_RUNNING = 0;
+    const STATUS_SUCCESS = 1;
     const STATUS_FAILED = 99;
 
     protected $fillable = [

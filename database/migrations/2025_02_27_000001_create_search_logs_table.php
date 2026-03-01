@@ -15,7 +15,7 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('search_condition_id')->comment('search_conditions.id');
             $table->string('frequency', 20)->comment('once|daily|weekly|monthly');
-            $table->integer('status')->comment('0:待機中 1:実行中 2:成功 99:失敗');
+            $table->integer('status')->comment('0:実行中 1:成功 99:失敗');
             $table->timestamps();
         });
     }

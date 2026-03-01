@@ -11,9 +11,18 @@ use Illuminate\Support\Facades\Log;
 
 class RakutenIchibaService
 {
-    public function search(SearchCondition $condition): array
+    private const HITS_MAX = 30;
+
+    private const PAGE_MAX = 100;
+
+    /**
+     * 1ページ分の検索を実行する。
+     *
+     * @return array 楽天APIのレスポンス（items, count 等）
+     */
+    public function searchOnePage(SearchCondition $condition, int $page, int $hits): array
     {
-        $params = $this->buildParams($condition);
+        $params = $this->buildParams($condition, $page, $hits);
         $endpoint = config('rakuten.item_search.endpoint');
         $accessKey = config('rakuten.access_key');
         $response = Http::withToken($accessKey)
@@ -37,31 +46,77 @@ class RakutenIchibaService
     }
 
     /**
-     * 検索実行し、shops / items / item_sites に保存する。
+     * total_hits に基づき複数ページ取得し、shops / items / item_sites に保存する。
+     * - hits=30（最大）、page=1 から順に取得。total_hits が 300 なら 10 ページで 300 件。
+     * - total_hits が 30 未満（例: 20）の場合は hits=20, page=1 で 20 件取得。
+     * - overwrite=0 のときは、既にこのサイトに紐づく商品はスキップし、新規紐づけが total_hits 件になるまで最大 100 ページまで繰り返す。
      *
      * @return array{count: int, saved_items: int, saved_shops: int}
      */
     public function searchAndSave(SearchCondition $condition, int $siteId): array
     {
-        $data = $this->search($condition);
-        $items = $data['items'] ?? [];
-        $count = (int) ($data['count'] ?? 0);
+        $targetCount = max(1, (int) $condition->total_hits);
+        $overwrite = $condition->overwrite === 1;
 
         $savedShops = 0;
         $savedItems = 0;
+        $totalFetched = 0;
 
         DB::beginTransaction();
         try {
-            foreach ($items as $row) {
-                $shop = $this->upsertShop($row);
-                if ($shop->wasRecentlyCreated) {
-                    $savedShops++;
-                }
+            if ($overwrite) {
+                $totalPages = (int) min(self::PAGE_MAX, ceil($targetCount / self::HITS_MAX));
+                for ($page = 1; $page <= $totalPages; $page++) {
+                    $hits = ($page === $totalPages && $targetCount % self::HITS_MAX !== 0)
+                        ? ($targetCount % self::HITS_MAX)
+                        : self::HITS_MAX;
+                    $data = $this->searchOnePage($condition, $page, $hits);
+                    $items = $data['items'] ?? [];
+                    $totalFetched += count($items);
 
-                $item = $this->upsertItem($row, $shop->id, $condition->overwrite === 1);
-                if ($item) {
-                    $savedItems++;
-                    $item->sites()->syncWithoutDetaching([$siteId]);
+                    foreach ($items as $row) {
+                        $shop = $this->upsertShop($row);
+                        if ($shop->wasRecentlyCreated) {
+                            $savedShops++;
+                        }
+                        $item = $this->upsertItem($row, $shop->id, true);
+                        if ($item) {
+                            $savedItems++;
+                            $item->sites()->syncWithoutDetaching([$siteId]);
+                        }
+                    }
+                }
+            } else {
+                $newLinked = 0;
+                $page = 1;
+                while ($newLinked < $targetCount && $page <= self::PAGE_MAX) {
+                    $hits = ($page === 1 && $targetCount < self::HITS_MAX)
+                        ? $targetCount
+                        : self::HITS_MAX;
+                    $data = $this->searchOnePage($condition, $page, $hits);
+                    $items = $data['items'] ?? [];
+                    $totalFetched += count($items);
+
+                    foreach ($items as $row) {
+                        if ($newLinked >= $targetCount) {
+                            break;
+                        }
+                        $shop = $this->upsertShop($row);
+                        if ($shop->wasRecentlyCreated) {
+                            $savedShops++;
+                        }
+                        $item = $this->upsertItem($row, $shop->id, false);
+                        if (! $item) {
+                            continue;
+                        }
+                        $alreadyLinked = $item->sites()->where('sites.id', $siteId)->exists();
+                        if (! $alreadyLinked) {
+                            $item->sites()->syncWithoutDetaching([$siteId]);
+                            $newLinked++;
+                            $savedItems++;
+                        }
+                    }
+                    $page++;
                 }
             }
 
@@ -72,21 +127,21 @@ class RakutenIchibaService
         }
 
         return [
-            'count' => $count,
+            'count' => $totalFetched,
             'saved_items' => $savedItems,
             'saved_shops' => $savedShops,
         ];
     }
 
-    protected function buildParams(SearchCondition $condition): array
+    protected function buildParams(SearchCondition $condition, int $page = 1, int $hits = self::HITS_MAX): array
     {
         $config = config('rakuten');
         $params = [
             'applicationId' => $config['application_id'],
             'affiliateId' => $config['affiliate_id'] ?: null,
             'formatVersion' => config('rakuten.item_search.format_version'),
-            'hits' => config('rakuten.item_search.default_hits'),
-            'page' => $condition->page ?? config('rakuten.item_search.default_page'),
+            'hits' => min(self::HITS_MAX, max(1, $hits)),
+            'page' => $page,
         ];
 
         $params = array_filter($params);

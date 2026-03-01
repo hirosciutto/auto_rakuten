@@ -40,12 +40,12 @@ POST /api/search-conditions
 | item_code | string | 商品コード（最大64文字）。例: `shop:1234` |
 | genre_id | integer | ジャンルID |
 | tag_id | string | タグID（カンマ区切り可、最大128文字） |
-| page | integer | 取得ページ（1〜100） |
+| total_hits | integer | 取得目標件数（1〜3000）。省略時は 300。hits=30 で page 1 から繰り返し、合計この件数まで取得。overwrite=0 の場合は既存紐づけをスキップし新規がこの件数になるまで最大100ページまで取得。 |
 | min_price | integer | 最低価格（0〜999999998） |
 | max_price | integer | 最高価格（0〜999999999） |
 | availability | integer | 在庫。`0`: すべて / `1`: 在庫ありのみ |
 | purchase_type | integer | 購入タイプ。`0`: 通常 / `1`: 定期購入 / `2`: 頒布会 |
-| overwrite | integer | 既存商品の上書き。`0`: スキップ / `1`: 上書き。省略時は `0` |
+| overwrite | integer | 既存商品の上書き。`0`: スキップ（既にサイトに紐づく商品は数えず、新規紐づけが total_hits 件になるまで取得を続ける） / `1`: 上書き。省略時は `0` |
 | is_active | integer | 有効フラグ。`0`: 無効 / `1`: 有効。省略時は `1` |
 
 ※ keyword / shop_code / item_code / genre_id のいずれか1つは、楽天API仕様上指定が推奨されます。
