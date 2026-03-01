@@ -304,7 +304,27 @@ class RakutenIchibaService
     }
 
     /**
-     * itemCode（形式: shop_code:item_id）から商品ページの正規URLを組み立てる。
+     * affiliate_url の ?pc= パラメータから商品ページの正規URLを取得する。
+     * pc はURLエンコードされた商品ページURL（例: https%3A%2F%2Fitem.rakuten.co.jp%2F...）
+     */
+    public function getItemUrlFromAffiliateUrl(string $affiliateUrl): ?string
+    {
+        $parsed = parse_url($affiliateUrl);
+        if (! isset($parsed['query'])) {
+            return null;
+        }
+        parse_str($parsed['query'], $params);
+        $pc = $params['pc'] ?? null;
+        if ($pc === null || $pc === '') {
+            return null;
+        }
+
+        $decoded = urldecode($pc);
+        return is_string($decoded) && $decoded !== '' ? $decoded : null;
+    }
+
+    /**
+     * itemCode（形式: shop_code:item_id）から商品ページの正規URLを組み立てる。（pc が取れない場合のフォールバック）
      */
     protected function buildItemUrlFromItemCode(string $itemCode): ?string
     {
@@ -321,9 +341,12 @@ class RakutenIchibaService
         $affiliateUrl = $row['affiliateUrl'] ?? null;
         $itemUrl = $row['itemUrl'] ?? null;
 
-        // アフィリエイトURLが返っている場合は itemUrl と同値になるため、item_url は itemCode から組み立てる
+        // item_url は affiliate_url の ?pc= パラメータ（デコード済みの商品URL）から取得
         if ($affiliateUrl !== null && $affiliateUrl !== '') {
-            $itemUrl = $this->buildItemUrlFromItemCode((string) $itemCode) ?? $itemUrl;
+            $itemUrl = $this->getItemUrlFromAffiliateUrl($affiliateUrl) ?? $itemUrl;
+        }
+        if ($itemUrl === null && $itemCode) {
+            $itemUrl = $this->buildItemUrlFromItemCode((string) $itemCode);
         }
 
         return [
