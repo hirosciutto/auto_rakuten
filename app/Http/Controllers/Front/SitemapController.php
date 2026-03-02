@@ -17,7 +17,7 @@ class SitemapController extends Controller
         $base = rtrim(config('app.url'), '/');
         $urls = [];
 
-        $raw = Post::query()->max('updated_at');
+        $raw = Post::query()->published()->max('updated_at');
         $latestPostUpdatedAt = $raw ? Carbon::parse($raw)->setTimezone('Asia/Tokyo')->format('c') : null;
 
         $staticPages = [

@@ -122,7 +122,7 @@
                                                     </select>
                                                 </div>
                                             @endif
-                                            {{-- @if ($key == 'published')
+                                            @if ($key == 'published' && $dataType->slug == 'posts')
                                                 <div class="col-md-2">
                                                     <select name="browse_search[{{ $key }}]" class="form-control">
                                                         <option value="">公開/下書き</option>
@@ -131,7 +131,7 @@
                                                     </select>
                                                 </div>
                                             @endif
-                                            @if ($key == 'delivered')
+                                            {{-- @if ($key == 'delivered')
                                                 <div class="col-md-2">
                                                     <select name="browse_search[{{ $key }}]" class="form-control">
                                                         <option value="">配信済み/未配信</option>

@@ -14,7 +14,21 @@ class Post extends Model
         'item_id',
         'title',
         'body',
+        'published_at',
     ];
+
+    protected $casts = [
+        'published_at' => 'datetime',
+    ];
+
+    /**
+     * 公開済み（published_at が現在以前）の post に絞る。
+     */
+    public function scopePublished($query)
+    {
+        return $query->whereNotNull('published_at')
+            ->where('published_at', '<=', now());
+    }
 
     public function item(): BelongsTo
     {

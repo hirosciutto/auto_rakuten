@@ -18,7 +18,7 @@ class TopController extends Controller
         $categories = CosmeCategory::categoryType()->orderBy('sort_order')->get();
         $moods = CosmeCategory::moodType()->orderBy('sort_order')->get();
 
-        $postsQuery = Post::query()->with(['item.shop', 'cosmeCategories']);
+        $postsQuery = Post::query()->published()->with(['item.shop', 'cosmeCategories']);
 
         if (request()->filled('cat')) {
             $postsQuery->whereHas('cosmeCategories', fn ($q) => $q->where('cosme_categories.slug', request('cat')));
@@ -31,7 +31,7 @@ class TopController extends Controller
             });
         }
 
-        $baseQuery = Post::query()->with(['item.shop', 'cosmeCategories']);
+        $baseQuery = Post::query()->published()->with(['item.shop', 'cosmeCategories']);
         $trending = (clone $baseQuery)
             ->join('items', 'posts.item_id', '=', 'items.id')
             ->orderBy('items.review_count', 'desc')
@@ -61,7 +61,7 @@ class TopController extends Controller
      */
     public function items(Request $request)
     {
-        $query = Post::query()->with(['item.shop', 'cosmeCategories']);
+        $query = Post::query()->published()->with(['item.shop', 'cosmeCategories']);
 
         $cosmeCategorySlug = $request->input('cat');
         if ($cosmeCategorySlug) {

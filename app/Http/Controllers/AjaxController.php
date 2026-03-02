@@ -41,6 +41,15 @@ class AjaxController extends Controller
             return response()->json(['status' => 'error', 'message' => "カラム '{$name}' が存在しません。"], 422);
         }
 
+        // published_at の場合は現在の時刻を設定
+        if ($name === 'published_at') {
+            if ($status == 1) {
+                $status = now();
+            } else {
+                $status = null;
+            }
+        }
+
         try {
             DB::table($tableName)
                 ->where($primaryKey, $id)

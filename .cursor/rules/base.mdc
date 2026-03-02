@@ -1,0 +1,10 @@
+---
+description: マイグレーション作成時の手順。新規マイグレーションを作るたびに守る。
+globs: database/migrations/**/*.php
+---
+
+# マイグレーション作成時
+
+- **必ず先に** ターミナルで `date +%Y_%m_%d` を実行し、表示された日付を確認してからファイルを作る。
+- ファイル名: `database/migrations/YYYY_MM_DD_000001_内容_snake_case.php`（日付は上記で確認した日付。連番は既存の次番号を使う）。
+- 例: `2025_03_01_000001_add_xxx_to_yyy_table.php`

@@ -31,4 +31,10 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'ollama' => [
+        'base_url' => env('OLLAMA_BASE_URL', 'http://host.docker.internal:11434'),
+        'post_model' => env('OLLAMA_POST_MODEL'),
+        'category_model' => env('OLLAMA_CATEGORY_MODEL'),
+    ],
+
 ];

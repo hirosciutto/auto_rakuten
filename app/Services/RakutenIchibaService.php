@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Genre;
 use App\Models\Item;
 use App\Models\SearchCondition;
 use App\Models\Shop;
@@ -257,6 +258,9 @@ class RakutenIchibaService
             $params['purchaseType'] = $condition->purchase_type;
         }
 
+        // ジャンル名取得のため（genreId が DB に無い場合の新規登録に使用）
+        $params['genreInformationFlag'] = 1;
+
         return $params;
     }
 
@@ -290,6 +294,15 @@ class RakutenIchibaService
         $existing = Item::where('item_code', $itemCode)->first();
         if ($existing && ! $overwrite) {
             return $existing;
+        }
+
+        $genreId = isset($row['genreId']) ? (int) $row['genreId'] : 0;
+        if ($genreId > 0) {
+            $this->ensureGenreExists(
+                $genreId,
+                $row['genreName'] ?? null,
+                isset($row['genreLevel']) ? (int) $row['genreLevel'] : null
+            );
         }
 
         $attributes = $this->mapItemRowToAttributes($row);
@@ -333,6 +346,20 @@ class RakutenIchibaService
         }
 
         return null;
+    }
+
+    /**
+     * genreId が DB に無ければ genreName と共に genres に新規登録する。
+     */
+    protected function ensureGenreExists(int $genreId, ?string $genreName, ?int $genreLevel): void
+    {
+        Genre::firstOrCreate(
+            ['id' => $genreId],
+            [
+                'genre_name' => $genreName ?? 'ジャンル' . $genreId,
+                'genre_level' => $genreLevel ?? 1,
+            ]
+        );
     }
 
     protected function mapItemRowToAttributes(array $row): array

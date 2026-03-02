@@ -108,6 +108,13 @@ class VoyagerBaseController extends BaseVoyagerBaseController
                         }
                     } else {
                         // カスタム: items の site は item_sites で紐づくものだけに絞る
+                        if ($fieldKey === 'published' && $dataType->slug === 'posts') {
+                            if ($value === '1') {
+                                $query->whereNotNull('published_at');
+                            } elseif ($value === '0') {
+                                $query->whereNull('published_at');
+                            }
+                        }
                         if ($fieldKey === 'site' && $dataType->slug === 'items') {
                             $query->whereHas('sites', function ($q) use ($value) {
                                 $q->where('sites.id', (int) $value);
