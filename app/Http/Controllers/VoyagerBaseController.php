@@ -107,7 +107,12 @@ class VoyagerBaseController extends BaseVoyagerBaseController
                             $query->where($searchField, 'LIKE', '%'.$value.'%');
                         }
                     } else {
-                        // カスタム
+                        // カスタム: items の site は item_sites で紐づくものだけに絞る
+                        if ($fieldKey === 'site' && $dataType->slug === 'items') {
+                            $query->whereHas('sites', function ($q) use ($value) {
+                                $q->where('sites.id', (int) $value);
+                            });
+                        }
                     }
                 }
             }

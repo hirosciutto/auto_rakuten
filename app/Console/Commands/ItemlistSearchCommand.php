@@ -17,7 +17,6 @@ class ItemlistSearchCommand extends Command
      * @var string
      */
     protected $signature = 'itemlist:search
-                            {site_id : サイトID（sites.id）}
                             {frequency : 実行対象の頻度（once|daily|weekly|monthly）}';
 
     /**
@@ -25,11 +24,10 @@ class ItemlistSearchCommand extends Command
      *
      * @var string
      */
-    protected $description = '指定サイト・頻度の検索条件で楽天APIを実行し、商品・ショップ・item_sites を保存する';
+    protected $description = '検索条件で楽天APIを実行し、商品・ショップ・item_sites を保存する';
 
     public function handle(RakutenIchibaService $service): int
     {
-        $siteId = (int) $this->argument('site_id');
         $frequency = $this->argument('frequency');
 
         $validFrequencies = ['once', 'daily', 'weekly', 'monthly'];
@@ -38,14 +36,7 @@ class ItemlistSearchCommand extends Command
             return self::FAILURE;
         }
 
-        $site = Site::find($siteId);
-        if (! $site) {
-            $this->error("サイト ID={$siteId} は存在しません。");
-            return self::FAILURE;
-        }
-
         $query = SearchCondition::query()
-            ->where('site_id', $siteId)
             ->where('is_active', 1)
             ->where('frequency', $frequency);
 
@@ -57,13 +48,12 @@ class ItemlistSearchCommand extends Command
 
         $conditions = $query->get();
         if ($conditions->isEmpty()) {
-            Log::info('ItemlistSearchCommand: no conditions', ['site_id' => $siteId, 'frequency' => $frequency]);
-            $this->info("対象の検索条件がありません。（site_id={$siteId}, frequency={$frequency}）");
+            Log::info('ItemlistSearchCommand: no conditions', ['frequency' => $frequency]);
+            $this->info("対象の検索条件がありません。（frequency={$frequency}）");
             return self::SUCCESS;
         }
 
         Log::info('ItemlistSearchCommand: start', [
-            'site_id' => $siteId,
             'frequency' => $frequency,
             'condition_count' => $conditions->count(),
             'condition_ids' => $conditions->pluck('id')->toArray(),
@@ -71,7 +61,7 @@ class ItemlistSearchCommand extends Command
         $this->info("検索条件 {$conditions->count()} 件を実行します。");
 
         foreach ($conditions as $condition) {
-            $this->runOne($service, $condition, $siteId);
+            $this->runOne($service, $condition, (int) $condition->site_id);
         }
 
         return self::SUCCESS;

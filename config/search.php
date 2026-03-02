@@ -1,5 +1,9 @@
 <?php
 return [
-    'fields' => [],
+    'fields' => [
+        'items' => [
+            'item_name', 'site'
+        ]
+    ],
     'default' => [],
 ];

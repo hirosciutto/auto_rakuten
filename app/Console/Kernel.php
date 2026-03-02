@@ -12,10 +12,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('itemlist:search 1 once')->everyFiveMinutes();
-        $schedule->command('itemlist:search 1 daily')->dailyAt('00:00');
-        $schedule->command('itemlist:search 1 weekly')->weeklyOn(1, '00:00');
-        $schedule->command('itemlist:search 1 monthly')->monthlyOn(1, '00:00');
+        $schedule->command('itemlist:search once')->everyFiveMinutes();
+        $schedule->command('itemlist:search daily')->dailyAt('00:00');
+        $schedule->command('itemlist:search weekly')->weeklyOn(1, '00:00');
+        $schedule->command('itemlist:search monthly')->monthlyOn(1, '00:00');
     }
 
     /**

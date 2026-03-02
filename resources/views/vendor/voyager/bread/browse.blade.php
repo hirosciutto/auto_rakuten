@@ -109,6 +109,19 @@
                                             </div>
                                             @endif
                                         @else
+                                            @if ($key == 'site' && $dataType->slug == 'items')
+                                                @php
+                                                    $sites = \App\Models\Site::orderBy('id', 'asc')->get();
+                                                @endphp
+                                                <div class="col-md-2">
+                                                    <select name="browse_search[{{ $key }}]" class="form-control">
+                                                        <option value="">サイト</option>
+                                                        @foreach ($sites as $site)
+                                                        <option value="{{ $site->id }}" @if (isset($searched_values[$key]) && $searched_values[$key] == $site->id) selected @endif>{{ $site->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            @endif
                                             {{-- @if ($key == 'published')
                                                 <div class="col-md-2">
                                                     <select name="browse_search[{{ $key }}]" class="form-control">
