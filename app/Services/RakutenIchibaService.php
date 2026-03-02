@@ -385,7 +385,7 @@ class RakutenIchibaService
             'point_rate_start_time' => $row['pointRateStartTime'] ?? null,
             'point_rate_end_time' => $row['pointRateEndTime'] ?? null,
             'gift_flag' => isset($row['giftFlag']) ? (int) $row['giftFlag'] : null,
-            'genre_id' => isset($row['genreId']) ? (int) $row['genreId'] : null,
+            'genre_id' => isset($row['genreId']) ? (int) $row['genreId'] : 0,
             'tag_ids' => $row['tagIds'] ?? null,
         ];
     }
