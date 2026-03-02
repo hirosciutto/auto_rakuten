@@ -258,9 +258,6 @@ class RakutenIchibaService
             $params['purchaseType'] = $condition->purchase_type;
         }
 
-        // ジャンル名取得のため（genreId が DB に無い場合の新規登録に使用）
-        $params['genreInformationFlag'] = 1;
-
         return $params;
     }
 

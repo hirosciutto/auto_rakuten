@@ -98,6 +98,8 @@ class ItemlistSearchCommand extends Command
                 'status' => SearchLog::STATUS_FAILED,
                 'error_message' => $e->getMessage(),
             ]);
+            $condition->update(['is_active' => 0]);
+
             Log::warning('ItemlistSearchCommand.runOne failed', [
                 'search_condition_id' => $condition->id,
                 'search_log_id' => $log->id,
