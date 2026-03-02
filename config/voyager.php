@@ -185,7 +185,7 @@ return [
     |
     */
 
-    'primary_color' => '#22c55e',
+    'primary_color' => '#FF6A00',
 
     'show_dev_tips' => true,
 

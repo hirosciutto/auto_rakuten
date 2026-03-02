@@ -42,5 +42,11 @@ if (app()->environment('production')) {
             ->middleware('admin.user');
 
         Voyager::routes();
+
+        // Voyager の resource より先に一致させるため、複製ルートは後に登録
+        Route::post('search-conditions/duplicate/{id}', [App\Http\Controllers\VoyagerBaseController::class, 'duplicateSearchCondition'])
+            ->name('voyager.search-conditions.duplicate')
+            ->middleware('admin.user')
+            ->whereNumber('id');
     });
 }

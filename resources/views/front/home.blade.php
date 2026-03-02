@@ -1,4 +1,4 @@
-@extends('cosmetica.layout')
+@extends('front.layout')
 
 @section('title', 'COSMETICA｜コスメ・美容のトレンド')
 
@@ -23,7 +23,7 @@
                 <div class="c-carousel" role="list">
                     @foreach($trending as $post)
                         <div class="c-carousel__item" role="listitem">
-                            @include('cosmetica.partials.product-card', ['post' => $post])
+                            @include('front.partials.product-card', ['post' => $post])
                         </div>
                     @endforeach
                 </div>
@@ -36,7 +36,7 @@
                 <h2 id="ranking-heading" class="c-h2 c-section__title">高評価ランキング</h2>
                 <div class="c-grid">
                     @foreach($ranking->take(5) as $post)
-                        @include('cosmetica.partials.product-card', ['post' => $post])
+                        @include('front.partials.product-card', ['post' => $post])
                     @endforeach
                 </div>
             </section>
@@ -56,7 +56,7 @@
                 <h2 id="product-grid-heading" class="visually-hidden">商品一覧</h2>
                 <div id="product-grid" class="c-grid" role="list">
                     @foreach($posts as $post)
-                        <div role="listitem">@include('cosmetica.partials.product-card', ['post' => $post])</div>
+                        <div role="listitem">@include('front.partials.product-card', ['post' => $post])</div>
                     @endforeach
                 </div>
                 <div id="product-grid-skeleton" class="c-grid" style="display: none;" aria-hidden="true">

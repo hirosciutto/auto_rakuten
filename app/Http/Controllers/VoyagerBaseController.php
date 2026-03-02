@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\SearchCondition;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -314,5 +315,29 @@ class VoyagerBaseController extends BaseVoyagerBaseController
         }
 
         return response()->json([], 404);
+    }
+
+    /**
+     * search-conditions の行を is_active=0 で複製する。
+     */
+    public function duplicateSearchCondition(Request $request)
+    {
+        $id = $request->route('id');
+        if ($id === null || (int) $id < 1) {
+            return redirect()->route('voyager.search-conditions.index')
+                ->with('error', '無効なリクエストです。');
+        }
+        $id = (int) $id;
+
+        $this->authorize('add', new SearchCondition());
+
+        $original = SearchCondition::findOrFail($id);
+        $new = $original->replicate();
+        $new->is_active = 0;
+        $new->save();
+
+        return redirect()
+            ->route('voyager.search-conditions.index')
+            ->with('success', '検索条件を複製しました。');
     }
 }

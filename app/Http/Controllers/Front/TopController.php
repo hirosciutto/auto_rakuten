@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Front;
 use App\Http\Controllers\Controller;
 use App\Models\CosmeCategory;
 use App\Models\Post;
-use App\Models\Site;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -16,11 +15,10 @@ class TopController extends Controller
      */
     public function index(): View
     {
-        $site = $this->getSite();
         $categories = CosmeCategory::categoryType()->orderBy('sort_order')->get();
         $moods = CosmeCategory::moodType()->orderBy('sort_order')->get();
 
-        $postsQuery = Post::forSite($site)->with(['item.shop', 'cosmeCategories']);
+        $postsQuery = Post::query()->with(['item.shop', 'cosmeCategories']);
 
         if (request()->filled('cat')) {
             $postsQuery->whereHas('cosmeCategories', fn ($q) => $q->where('cosme_categories.slug', request('cat')));
@@ -33,7 +31,7 @@ class TopController extends Controller
             });
         }
 
-        $baseQuery = Post::forSite($site)->with(['item.shop', 'cosmeCategories']);
+        $baseQuery = Post::query()->with(['item.shop', 'cosmeCategories']);
         $trending = (clone $baseQuery)
             ->join('items', 'posts.item_id', '=', 'items.id')
             ->orderBy('items.review_count', 'desc')
@@ -49,8 +47,7 @@ class TopController extends Controller
             ->get();
         $posts = (clone $postsQuery)->orderBy('posts.id')->paginate(24);
 
-        return view('cosmetica.home', [
-            'site' => $site,
+        return view('front.home', [
             'categories' => $categories,
             'moods' => $moods,
             'trending' => $trending,
@@ -64,8 +61,7 @@ class TopController extends Controller
      */
     public function items(Request $request)
     {
-        $site = $this->getSite();
-        $query = Post::forSite($site)->with(['item.shop', 'cosmeCategories']);
+        $query = Post::query()->with(['item.shop', 'cosmeCategories']);
 
         $cosmeCategorySlug = $request->input('cat');
         if ($cosmeCategorySlug) {
@@ -83,11 +79,5 @@ class TopController extends Controller
                 'total' => $posts->total(),
             ],
         ]);
-    }
-
-    protected function getSite(): Site
-    {
-        $siteId = config('cosmetica.site_id');
-        return Site::findOrFail($siteId);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Actions\CopySearchConditionAction;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use TCG\Voyager\Facades\Voyager;
@@ -21,6 +22,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Voyager::addAction(CopySearchConditionAction::class);
+
         // publish した Voyager ビューを優先（resources/views/vendor/voyager を先に参照）
         View::getFinder()->prependNamespace('voyager', resource_path('views/vendor/voyager'));
 

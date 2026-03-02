@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
 use App\Models\Post;
-use App\Models\Site;
 use Carbon\Carbon;
 use Illuminate\Http\Response;
 
@@ -16,18 +15,10 @@ class SitemapController extends Controller
     public function index(): Response
     {
         $base = rtrim(config('app.url'), '/');
-        $siteId = (int) config('cosmetica.site_id', 1);
-        $site = Site::find($siteId);
-
         $urls = [];
 
-        $latestPostUpdatedAt = null;
-        if ($site) {
-            $raw = Post::forSite($site)->max('updated_at');
-            if ($raw) {
-                $latestPostUpdatedAt = Carbon::parse($raw)->setTimezone('Asia/Tokyo')->format('c');
-            }
-        }
+        $raw = Post::query()->max('updated_at');
+        $latestPostUpdatedAt = $raw ? Carbon::parse($raw)->setTimezone('Asia/Tokyo')->format('c') : null;
 
         $staticPages = [
             '/' => $latestPostUpdatedAt,

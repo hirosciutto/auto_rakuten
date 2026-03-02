@@ -45,12 +45,14 @@ class ItemController extends Controller
         }
 
         if ($request->filled('ng_keyword')) {
-            $ng = trim($request->input('ng_keyword'));
-            $query->where(function ($q) use ($ng) {
-                $q->where('item_name', 'not like', '%' . $ng . '%')
-                    ->where('catchcopy', 'not like', '%' . $ng . '%')
-                    ->where('item_caption', 'not like', '%' . $ng . '%');
-            });
+            $ngWords = preg_split('/\s+/u', trim($request->input('ng_keyword')), -1, PREG_SPLIT_NO_EMPTY);
+            foreach ($ngWords as $ng) {
+                $query->where(function ($q) use ($ng) {
+                    $q->where('item_name', 'not like', '%' . $ng . '%')
+                        ->where('catchcopy', 'not like', '%' . $ng . '%')
+                        ->where('item_caption', 'not like', '%' . $ng . '%');
+                });
+            }
         }
 
         if ($request->filled('genre_id')) {

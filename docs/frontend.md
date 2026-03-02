@@ -1,4 +1,4 @@
-# COSMETICA
+# フロント仕様
 ## AI Implementation-Ready Master Specification
 Generated: 2026-02-27 18:09
 
