@@ -98,11 +98,15 @@ class ItemlistSearchCommand extends Command
                 'status' => SearchLog::STATUS_FAILED,
                 'error_message' => $e->getMessage(),
             ]);
-            $updates = ['is_active' => 0];
+            $updates = [];
             if (str_contains($e->getMessage(), 'genreId is not exist')) {
                 $updates['genre_id'] = null;
+            } else {
+                $updates['is_active'] = 0;
             }
-            $condition->update($updates);
+            if ($updates !== []) {
+                $condition->update($updates);
+            }
 
             Log::warning('ItemlistSearchCommand.runOne failed', [
                 'search_condition_id' => $condition->id,
