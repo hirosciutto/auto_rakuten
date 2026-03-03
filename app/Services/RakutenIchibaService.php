@@ -135,6 +135,9 @@ class RakutenIchibaService
                         DB::rollBack();
                         throw $e;
                     }
+                    if (count($items) === 0) {
+                        break;
+                    }
                 }
             } else {
                 $newLinked = 0;
@@ -185,6 +188,9 @@ class RakutenIchibaService
                     } catch (\Throwable $e) {
                         DB::rollBack();
                         throw $e;
+                    }
+                    if (count($items) === 0) {
+                        break;
                     }
                     $page++;
                 }
