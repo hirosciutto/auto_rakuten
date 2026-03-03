@@ -1,11 +1,11 @@
 # API エンドポイント仕様
 
-外部から検索条件の登録および商品一覧の取得を行うための API です。  
+外部から検索条件の登録および商品一覧の取得を行うための API です。
 認証は **access_code**（`sites.access_code`）で行います。
 
 **ベースURL:** `https://cosmetica.jp/api`
 
-**Content-Type:** `application/json`  
+**Content-Type:** `application/json`
 **Accept:** `application/json`
 
 ---

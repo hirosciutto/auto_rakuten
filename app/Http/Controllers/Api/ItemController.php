@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\IndexItemsRequest;
 use App\Models\Site;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 class ItemController extends Controller
 {
@@ -16,6 +17,19 @@ class ItemController extends Controller
     public function index(IndexItemsRequest $request): JsonResponse
     {
         $site = Site::where('access_code', $request->input('access_code'))->firstOrFail();
+
+        Log::info('Api ItemController.index', [
+            'site_id' => $site->id,
+            'search' => [
+                'keyword' => $request->input('keyword'),
+                'or_flag' => $request->input('or_flag'),
+                'ng_keyword' => $request->input('ng_keyword'),
+                'genre_id' => $request->input('genre_id'),
+                'tag_id' => $request->input('tag_id'),
+                'page' => $request->input('page'),
+                'per_page' => $request->input('per_page'),
+            ],
+        ]);
 
         $query = $site->items()->with('shop');
 
