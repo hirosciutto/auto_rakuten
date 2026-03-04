@@ -6,6 +6,9 @@ return [
         ],
         'posts' => [
             'title', 'published'
+        ],
+        'search-conditions' => [
+            'is_active'
         ]
     ],
     'default' => [],

@@ -40,7 +40,6 @@ POST /api/search-conditions
 | item_code | string | 商品コード（最大64文字）。例: `shop:1234` |
 | genre_id | integer | ジャンルID |
 | tag_id | string | タグID（カンマ区切り可、最大128文字） |
-| sort | string | 楽天API ソート。`standard`（省略時）/ `+itemPrice` / `-itemPrice` / `+reviewCount` / `-reviewCount` / `+reviewAverage` / `-reviewAverage` / `+affiliateRate` / `-affiliateRate` / `+updateTimestamp` / `-updateTimestamp` |
 | total_hits | integer | 取得目標件数（1〜3000）。省略時は 300。hits=30 で page 1 から繰り返し、合計この件数まで取得。overwrite=0 の場合は既存紐づけをスキップし新規がこの件数になるまで最大100ページまで取得。 |
 | min_price | integer | 最低価格（0〜999999998） |
 | max_price | integer | 最高価格（0〜999999999） |
@@ -247,6 +246,80 @@ curl "https://cosmetica.jp/api/items?access_code=your_access_code&keyword=福袋
 
 # 除外キーワード・ジャンル・タグ・ページネーション
 curl "https://cosmetica.jp/api/items?access_code=your_access_code&ng_keyword=中古&genre_id=100&tag_id=1,2&page=1&per_page=20"
+```
+
+---
+
+## 3. 個別商品の取得
+
+指定サイトに紐づく商品を、商品ID（内部ID）で1件取得します。
+
+### エンドポイント
+
+```
+GET /api/items/{id}
+```
+
+### リクエスト
+
+#### パス
+
+| パラメータ | 型 | 説明 |
+|------------|-----|------|
+| id | integer | 商品ID（内部）。一覧 API の `data[].id` で取得できる値。 |
+
+#### 必須パラメータ（クエリ）
+
+| パラメータ | 型 | 説明 |
+|------------|-----|------|
+| access_code | string | サイト識別用。`sites.access_code` と一致する値。 |
+
+### レスポンス
+
+#### 成功時（200 OK）
+
+一覧 API の「商品オブジェクト」と同じ形式で、`data` に1件だけ入ります。`shop` も含まれます。
+
+```json
+{
+  "data": {
+    "id": 1,
+    "item_code": "shop:1234",
+    "item_name": "商品名",
+    "catchcopy": "キャッチコピー",
+    "item_price": 1980,
+    "item_url": "https://item.rakuten.co.jp/shop/1234/",
+    "affiliate_url": "https://...",
+    "genre_id": 100,
+    "tag_ids": [1, 2],
+    "shop": {
+      "id": 1,
+      "shop_code": "shop",
+      "shop_name": "ショップ名",
+      "shop_url": "https://...",
+      "shop_affiliate_url": "https://..."
+    }
+  }
+}
+```
+
+プロパティ一覧は「2. 商品一覧の取得」の **`data` 内の各要素（商品オブジェクト）のプロパティ一覧** および **`shop` オブジェクトのプロパティ一覧** と同じです。
+
+#### エラー時
+
+- **access_code** に紐づくサイトが存在しない場合: **422 Unprocessable Entity**。`errors.access_code` にメッセージが入ります。
+- 指定した **id** の商品が存在しない、またはそのサイトに紐づいていない場合: **404 Not Found**。
+
+```json
+{
+  "message": "指定された商品が見つかりません。"
+}
+```
+
+### リクエスト例
+
+```bash
+curl "https://cosmetica.jp/api/items/123?access_code=your_access_code"
 ```
 
 ---

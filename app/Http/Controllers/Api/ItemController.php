@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\IndexItemsRequest;
+use App\Http\Requests\Api\ShowItemRequest;
 use App\Models\Site;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
@@ -92,5 +93,25 @@ class ItemController extends Controller
                 'total' => $items->total(),
             ],
         ]);
+    }
+
+    /**
+     * 指定サイトに紐づく商品を1件取得する。
+     */
+    public function show(ShowItemRequest $request, string $id): JsonResponse
+    {
+        $site = Site::where('access_code', $request->input('access_code'))->firstOrFail();
+        $itemId = (int) $id;
+        if ($itemId < 1) {
+            return response()->json(['message' => 'Invalid item id.'], 422);
+        }
+
+        $item = $site->items()->where('items.id', $itemId)->with('shop')->first();
+
+        if (! $item) {
+            return response()->json(['message' => '指定された商品が見つかりません。'], 404);
+        }
+
+        return response()->json(['data' => $item]);
     }
 }

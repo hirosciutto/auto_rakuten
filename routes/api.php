@@ -21,3 +21,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('search-conditions', [App\Http\Controllers\Api\SearchConditionController::class, 'store']);
 
 Route::get('items', [App\Http\Controllers\Api\ItemController::class, 'index']);
+Route::get('items/{id}', [App\Http\Controllers\Api\ItemController::class, 'show'])
+    ->whereNumber('id');
