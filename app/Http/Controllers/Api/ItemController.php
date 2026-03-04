@@ -96,17 +96,17 @@ class ItemController extends Controller
     }
 
     /**
-     * 指定サイトに紐づく商品を1件取得する。
+     * 指定サイトに紐づく商品を item_code（xxxx:xxxx）で1件取得する。
      */
-    public function show(ShowItemRequest $request, string $id): JsonResponse
+    public function show(ShowItemRequest $request, string $item_code): JsonResponse
     {
         $site = Site::where('access_code', $request->input('access_code'))->firstOrFail();
-        $itemId = (int) $id;
-        if ($itemId < 1) {
-            return response()->json(['message' => 'Invalid item id.'], 422);
+        $itemCode = trim($item_code);
+        if ($itemCode === '' || strlen($itemCode) > 256) {
+            return response()->json(['message' => 'Invalid item_code.'], 422);
         }
 
-        $item = $site->items()->where('items.id', $itemId)->with('shop')->first();
+        $item = $site->items()->where('items.item_code', $itemCode)->with('shop')->first();
 
         if (! $item) {
             return response()->json(['message' => '指定された商品が見つかりません。'], 404);

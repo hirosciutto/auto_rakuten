@@ -252,13 +252,15 @@ curl "https://cosmetica.jp/api/items?access_code=your_access_code&ng_keyword=中
 
 ## 3. 個別商品の取得
 
-指定サイトに紐づく商品を、商品ID（内部ID）で1件取得します。
+指定サイトに紐づく商品を、商品コード（item_code）で1件取得します。
 
 ### エンドポイント
 
 ```
-GET /api/items/{id}
+GET /api/items/{item_code}
 ```
+
+`item_code` は URL パスにそのまま含めます。コロン（`:`）を含む場合は URL エンコードしてください（例: `shop:1234` → `shop%3A1234`）。
 
 ### リクエスト
 
@@ -266,7 +268,7 @@ GET /api/items/{id}
 
 | パラメータ | 型 | 説明 |
 |------------|-----|------|
-| id | integer | 商品ID（内部）。一覧 API の `data[].id` で取得できる値。 |
+| item_code | string | 商品コード（例: `shop:1234`）。一覧 API の `data[].item_code` で取得できる値。最大256文字。 |
 
 #### 必須パラメータ（クエリ）
 
@@ -308,7 +310,7 @@ GET /api/items/{id}
 #### エラー時
 
 - **access_code** に紐づくサイトが存在しない場合: **422 Unprocessable Entity**。`errors.access_code` にメッセージが入ります。
-- 指定した **id** の商品が存在しない、またはそのサイトに紐づいていない場合: **404 Not Found**。
+- 指定した **item_code** の商品が存在しない、またはそのサイトに紐づいていない場合: **404 Not Found**。
 
 ```json
 {
@@ -319,7 +321,8 @@ GET /api/items/{id}
 ### リクエスト例
 
 ```bash
-curl "https://cosmetica.jp/api/items/123?access_code=your_access_code"
+# item_code が shop:1234 の場合（コロンは %3A にエンコード）
+curl "https://cosmetica.jp/api/items/shop%3A1234?access_code=your_access_code"
 ```
 
 ---
